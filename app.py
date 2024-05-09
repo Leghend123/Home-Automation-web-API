@@ -20,8 +20,12 @@ def create_room():
         sql_select_query = "SELECT * FROM rooms WHERE name = ?"
         cursor.execute(sql_select_query, (name,))
         room_id = cursor.fetchone()[0]
+        
 
     return{"id": room_id, "message": f"Room {name} created."}, 201
+
+
+oijjddddd
     
 
 
