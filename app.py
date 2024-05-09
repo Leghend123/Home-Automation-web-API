@@ -25,7 +25,9 @@ def create_room():
     return{"id": room_id, "message": f"Room {name} created."}, 201
 
 
-oijjddddd
+@app.post("/api/temperature")
+def create_temp():
+    pass
     
 
 
