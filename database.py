@@ -15,3 +15,4 @@ print("created temperature successfully")
 
 
 conn.close()
+
