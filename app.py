@@ -15,8 +15,6 @@ def create_room():
     with sqlite3.connect("database.db") as con:
         cursor = con.cursor()
         sql_query = "INSERT INTO rooms(name) VALUES (?)"
-        Rooms = CREATE_ROOMS_TABLE
-        cursor.execute(Rooms)
         cursor.execute(sql_query, (name,))
 
         #fetch query
@@ -61,5 +59,23 @@ def get_average_temp():
 
     return {"average": round(average, 2), "days": days}
 
-    
+
+#Finding Average temperature from specific room
+@app.get("/api/room/<int:room_id>")
+def get_all_room(room_id):
+    with sqlite3.connect("database.db") as con:
+        cursor = con.cursor()
+        Room_Name_Query = """ SELECT name FROM rooms WHERE id = (?) """
+        Room_Days_Query = """ SELECT COUNT(DISTINCT DATE(date)) as days FROM temperatures WHERE room_id = (?) """
+        Room_All_Time_Avg_Temp = """ SELECT AVG(temperature) as average FROM temperatures WHERE room_id = (?)"""
+        cursor.execute(Room_Name_Query, (room_id,))
+        Room_Name = cursor.fetchone()[0]
+        cursor.execute(Room_Days_Query, (room_id,))
+        Room_Days = cursor.fetchone()[0]
+        cursor.execute(Room_All_Time_Avg_Temp, (room_id,))
+        Room_Avg_temp = cursor.fetchone()[0]
+    return {"Room Name": Room_Name, "Days":Room_Days, "Room Average Temp": Room_Avg_temp}
+
+
+
 
