@@ -63,19 +63,44 @@ def get_average_temp():
 #Finding Average temperature from specific room
 @app.get("/api/room/<int:room_id>")
 def get_all_room(room_id):
+    args = request.args
+    term = args.get("term")
+    if term is not None:
+        return get_room_term(room_id, term)
+    else:
+        with sqlite3.connect("database.db") as con:
+            cursor = con.cursor()
+            Room_Name_Query = """ SELECT name FROM rooms WHERE id = (?) """
+            Room_Days_Query = """ SELECT COUNT(DISTINCT DATE(date)) as days FROM temperatures WHERE room_id = (?) """
+            Room_All_Time_Avg_Temp = """ SELECT AVG(temperature) as average FROM temperatures WHERE room_id = (?)"""
+            cursor.execute(Room_Name_Query, (room_id,))
+            Room_Name = cursor.fetchone()[0]
+            cursor.execute(Room_Days_Query, (room_id,))
+            Room_Days = cursor.fetchone()[0]
+            cursor.execute(Room_All_Time_Avg_Temp, (room_id,))
+            Room_Avg_temp = cursor.fetchone()[0]
+        return {
+              "Room Name": Room_Name,
+              "Days":Room_Days, 
+              "Room Average Temp": Room_Avg_temp
+        }
+
+
+
+def get_room_term(room_id,term):
+    terms = {"week":7, "month":30}
     with sqlite3.connect("database.db") as con:
         cursor = con.cursor()
+        Room_Terms_Query = """SELECT DATE(temperatures.date) as reading_date,AVG(temperatures.temperature)FROM temperaturesWHERE temperatures.room_id = (%s)GROUP BY reading_dateHAVING DATE(temperatures.date) > (SELECT MAX(DATE(temperatures.date))-(%s) FROM temperatures);"""
         Room_Name_Query = """ SELECT name FROM rooms WHERE id = (?) """
-        Room_Days_Query = """ SELECT COUNT(DISTINCT DATE(date)) as days FROM temperatures WHERE room_id = (?) """
-        Room_All_Time_Avg_Temp = """ SELECT AVG(temperature) as average FROM temperatures WHERE room_id = (?)"""
-        cursor.execute(Room_Name_Query, (room_id,))
+        cursor.execute(Room_Name_Query,(room_id,))
         Room_Name = cursor.fetchone()[0]
-        cursor.execute(Room_Days_Query, (room_id,))
-        Room_Days = cursor.fetchone()[0]
-        cursor.execute(Room_All_Time_Avg_Temp, (room_id,))
-        Room_Avg_temp = cursor.fetchone()[0]
-    return {"Room Name": Room_Name, "Days":Room_Days, "Room Average Temp": Room_Avg_temp}
-
-
-
+        cursor.execute(Room_Terms_Query,(room_id, terms[term]))
+        Dates_Of_Temperatures = cursor.fetchone()[0]
+        Average = sum(day[1] for day in Dates_Of_Temperatures) / len(Dates_Of_Temperatures)
+    return {
+        "Roon Name": Room_Name,
+        "temperatures": Dates_Of_Temperatures,
+        "average": round(Average, 2),
+    }
 
