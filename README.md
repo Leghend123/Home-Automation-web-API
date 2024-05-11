@@ -15,3 +15,9 @@ Activate the virtual environment and install the dependencies using pip:
  -pip install -r requirements.txt
 Run the app:
 - flask run
+
+ENDPOINTS............
+- @app.post("/api/room")
+- @app.post("/api/temperature")
+- @app.get("/api/average")
+- @app.get("/api/room/<int:room_id>")
