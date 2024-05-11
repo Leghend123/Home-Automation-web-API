@@ -34,7 +34,6 @@ def add_temp():
     
     try:
         date = datetime.strptime(data["date"], "%m-%d-%Y %H:%M:%S")
-
     except KeyError:
         date = datetime.now(timezone.utc)
 
@@ -42,7 +41,6 @@ def add_temp():
         cursor = con.cursor()
         temp_query = "INSERT INTO temperatures(room_id, temperature, date) VALUES(?,?,?)"
         cursor.execute(temp_query, (room_id, temperature, date))
-
     return {"message": "Temperature added."}, 201
 
 #Finding Average
@@ -56,7 +54,6 @@ def get_average_temp():
         average = cursor.fetchone()[0]
         cursor.execute(Total_Num_Of_Days)
         days = cursor.fetchone()[0]
-
     return {"average": round(average, 2), "days": days}
 
 
@@ -86,12 +83,12 @@ def get_all_room(room_id):
         }
 
 
-
+#function for terms at which users can search from the temperature Avg about room....
 def get_room_term(room_id,term):
     terms = {"week":7, "month":30}
     with sqlite3.connect("database.db") as con:
         cursor = con.cursor()
-        Room_Terms_Query = """SELECT DATE(temperatures.date) as reading_date,AVG(temperatures.temperature)FROM temperaturesWHERE temperatures.room_id = (%s)GROUP BY reading_dateHAVING DATE(temperatures.date) > (SELECT MAX(DATE(temperatures.date))-(%s) FROM temperatures);"""
+        Room_Terms_Query = """SELECT DATE(temperatures.date) as reading_date,AVG(temperatures.temperature)FROM temperatures WHERE temperatures.room_id = (%s)GROUP BY reading_date HAVING DATE(temperatures.date) > (SELECT MAX(DATE(temperatures.date))-(%s) FROM temperatures);"""
         Room_Name_Query = """ SELECT name FROM rooms WHERE id = (?) """
         cursor.execute(Room_Name_Query,(room_id,))
         Room_Name = cursor.fetchone()[0]
