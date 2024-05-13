@@ -4,7 +4,7 @@ Home automation web service to retrieve and store temperature in different room 
 -Real-time collection of temperature readings from IoT devices enables continuous monitoring and analysis of temperature variations in various environments. By leveraging sensors connected to IoT networks, temperature data can be gathered remotely and instantaneously.
 
 -QUICKSTART..............
-Create a .env file with a DATABASE_URL variable that points to a PostgreSQL database. Look at .env.example for information on how this should be written.
+Create a .env file with a SQLite database. Look at .env.example for information on how this should be written.
 
 Create a Python virtual environment:
  - python3.10 -m venv .venv
